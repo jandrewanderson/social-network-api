@@ -75,6 +75,12 @@ const createReaction = async (req, res) => {
         console.log(thought);
         await thought.reactions.push(req.body)
         await thought.save((err) => console.error(err))
+        const updatedUser = await User.findOne(
+            {username: thought.username}
+        );
+        await updatedUser.thoughts.id(req.params.thoughtId).remove();
+        await updatedUser.thoughts.push(thought);
+        await updatedUser.save((err) => console.error(err));
         res.status(200).json(thought);
     } catch (err) {
         console.error(err);
@@ -86,6 +92,12 @@ const deleteReaction = async (req, res) => {
         const thought = await Thought.findById({ _id: req.params.thoughtId});
         await thought.reactions.id(req.params.reactionId).remove()
         await thought.save((err) => console.error(err));
+        const updatedUser = await User.findOne(
+            {username: thought.username}
+        );
+        await updatedUser.thoughts.id(req.params.thoughtId).remove();
+        await updatedUser.thoughts.push(thought);
+        await updatedUser.save((err) => console.error(err));
         res.status(200).json(thought);
     } catch (err) {
         console.error(err);
